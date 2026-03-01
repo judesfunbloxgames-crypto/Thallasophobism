@@ -3,196 +3,274 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Abyssal Breach: Subcomplex 115</title>
+  <title>Abyssal Breach 3D: Subcomplex 115</title>
   <style>
     :root {
-      --bg: #020712;
-      --panel: #081425;
-      --accent: #3bc7d6;
-      --danger: #f0626a;
-      --text: #d6f0ff;
-      --muted: #8aa8bb;
+      --bg: #02070f;
+      --panel: rgba(4, 14, 26, 0.86);
+      --accent: #48d7e6;
+      --danger: #ff6a78;
+      --ok: #78f5b2;
+      --muted: #8ca9bb;
+      --text: #d9f5ff;
     }
 
+    html,
     body {
       margin: 0;
-      background: radial-gradient(circle at 30% 20%, #09203d 0%, var(--bg) 45%);
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: Inter, "Segoe UI", Tahoma, sans-serif;
+      background: var(--bg);
       color: var(--text);
-      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
-      min-height: 100vh;
+    }
+
+    #game {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .hud {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      right: 12px;
       display: grid;
-      place-items: center;
-      padding: 1.5rem;
-      box-sizing: border-box;
+      grid-template-columns: repeat(5, minmax(120px, 1fr));
+      gap: 8px;
+      z-index: 20;
+      pointer-events: none;
     }
 
-    .game {
-      width: min(1000px, 100%);
-      background: linear-gradient(160deg, rgba(7, 20, 37, 0.95), rgba(3, 8, 15, 0.95));
-      border: 1px solid rgba(59, 199, 214, 0.3);
-      border-radius: 14px;
-      padding: 1.2rem;
-      box-shadow: 0 0 20px rgba(59, 199, 214, 0.2);
-      display: grid;
-      gap: 1rem;
-    }
-
-    h1 {
-      margin: 0;
-      letter-spacing: 0.05em;
-      color: var(--accent);
-      font-size: 1.6rem;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(120px, 1fr));
-      gap: 0.8rem;
-    }
-
-    .stat {
-      background: rgba(10, 28, 48, 0.85);
-      border: 1px solid rgba(138, 168, 187, 0.22);
+    .tile {
+      background: var(--panel);
+      border: 1px solid rgba(72, 215, 230, 0.32);
       border-radius: 10px;
-      padding: 0.6rem;
+      padding: 8px 10px;
+      backdrop-filter: blur(3px);
     }
 
-    .stat-label {
+    .k {
       color: var(--muted);
-      font-size: 0.78rem;
+      font-size: 0.73rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
 
-    .stat-value {
-      margin-top: 0.2rem;
-      font-size: 1.05rem;
-      font-weight: bold;
+    .v {
+      margin-top: 4px;
+      font-weight: 700;
+      font-size: 0.98rem;
     }
 
-    #roomDescription,
-    #eventLog {
-      background: rgba(3, 15, 27, 0.95);
-      border: 1px solid rgba(59, 199, 214, 0.2);
+    #message,
+    #instructions {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      z-index: 20;
+      background: var(--panel);
+      border: 1px solid rgba(72, 215, 230, 0.32);
       border-radius: 10px;
-      padding: 0.9rem;
-      min-height: 88px;
-      line-height: 1.4;
+      padding: 10px 12px;
+      backdrop-filter: blur(3px);
     }
 
-    #eventLog {
-      border-color: rgba(240, 98, 106, 0.35);
-      white-space: pre-line;
+    #message {
+      bottom: 70px;
+      min-height: 56px;
+      line-height: 1.35;
     }
 
-    .controls {
+    #instructions {
+      bottom: 12px;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    #overlay {
+      position: fixed;
+      inset: 0;
       display: grid;
-      grid-template-columns: repeat(4, minmax(130px, 1fr));
-      gap: 0.6rem;
+      place-items: center;
+      z-index: 30;
+      background: radial-gradient(circle at center, rgba(5, 24, 38, 0.7) 0%, rgba(2, 7, 15, 0.94) 65%);
     }
 
-    button {
-      border: 1px solid rgba(59, 199, 214, 0.4);
-      background: #092c45;
-      color: var(--text);
-      padding: 0.8rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
+    #overlayCard {
+      width: min(760px, calc(100% - 36px));
+      border: 1px solid rgba(72, 215, 230, 0.34);
+      border-radius: 14px;
+      background: rgba(4, 14, 26, 0.9);
+      padding: 18px;
+      box-shadow: 0 0 24px rgba(72, 215, 230, 0.2);
     }
 
-    button:hover:enabled {
-      filter: brightness(1.18);
-    }
-
-    button:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
+    h1 {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 1.45rem;
     }
 
     .danger {
-      border-color: rgba(240, 98, 106, 0.45);
-      background: #421220;
+      color: var(--danger);
+      font-weight: 700;
     }
 
-    .footer-note {
-      color: var(--muted);
-      font-size: 0.9rem;
+    .ok {
+      color: var(--ok);
+      font-weight: 700;
     }
 
-    @media (max-width: 800px) {
-      .stats,
-      .controls {
-        grid-template-columns: repeat(2, minmax(120px, 1fr));
+    button {
+      margin-top: 8px;
+      border: 1px solid rgba(72, 215, 230, 0.4);
+      background: #0b2e48;
+      color: var(--text);
+      border-radius: 8px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    @media (max-width: 900px) {
+      .hud {
+        grid-template-columns: repeat(3, minmax(120px, 1fr));
       }
     }
   </style>
 </head>
 <body>
-  <main class="game">
-    <h1>Abyssal Breach: Subcomplex 115</h1>
+  <canvas id="game"></canvas>
 
-    <section class="stats">
-      <div class="stat"><div class="stat-label">Room</div><div id="roomNum" class="stat-value"></div></div>
-      <div class="stat"><div class="stat-label">Integrity</div><div id="health" class="stat-value"></div></div>
-      <div class="stat"><div class="stat-label">Sanity</div><div id="sanity" class="stat-value"></div></div>
-      <div class="stat"><div class="stat-label">Entities Seen</div><div id="seen" class="stat-value"></div></div>
-    </section>
+  <div class="hud">
+    <div class="tile"><div class="k">Room</div><div class="v" id="room">1 / 115</div></div>
+    <div class="tile"><div class="k">Integrity</div><div class="v" id="integrity">100%</div></div>
+    <div class="tile"><div class="k">Sanity</div><div class="v" id="sanity">100%</div></div>
+    <div class="tile"><div class="k">Entities Seen</div><div class="v" id="seen">0</div></div>
+    <div class="tile"><div class="k">Flares</div><div class="v" id="flares">3</div></div>
+  </div>
 
-    <section id="roomDescription"></section>
-    <section id="eventLog"></section>
+  <div id="message">Reach room 115 and seal the command vault.</div>
+  <div id="instructions">WASD move • Mouse look • Shift sprint • C crouch (noise avoidance) • L light toggle (light-sensitive entity) • F flare decoy • E hide near lockers</div>
 
-    <section class="controls">
-      <button id="advanceBtn">Advance to Next Room</button>
-      <button id="scanBtn">Scan Room</button>
-      <button id="hideBtn">Hide</button>
-      <button id="fightBtn" class="danger">Fight</button>
-    </section>
-
-    <div class="footer-note">
-      Survive all <strong>115</strong> rooms and reach the dry command vault. Every room may hold multiple entities.
+  <div id="overlay">
+    <div id="overlayCard">
+      <h1>Abyssal Breach 3D: Subcomplex 115</h1>
+      <p>You are inside a flooded deep-sea submarine complex. Traverse <strong>115 connected rooms</strong> in first person.</p>
+      <p>Each room can spawn entities with different weaknesses:</p>
+      <ul>
+        <li><strong>Brine Stalker</strong>: reacts to <em>sound</em> (crouch to reduce noise).</li>
+        <li><strong>Lumen Leech</strong>: hunts your <em>light</em> (toggle lamp off with L).</li>
+        <li><strong>Sonar Widow</strong>: tracks <em>line-of-sight</em> (hide by lockers with E).</li>
+        <li><strong>Anchor Hound</strong>: can be distracted by <em>flares</em> (F).</li>
+      </ul>
+      <p class="danger">If integrity or sanity reaches zero, you are lost to the deep.</p>
+      <button id="start">Start Dive</button>
     </div>
-  </main>
+  </div>
 
-  <script>
+  <script type="module">
+    import * as THREE from 'https://unpkg.com/three@0.164.1/build/three.module.js';
+    import { PointerLockControls } from 'https://unpkg.com/three@0.164.1/examples/jsm/controls/PointerLockControls.js';
+
     const TOTAL_ROOMS = 115;
+    const ROOM_LENGTH = 20;
 
-    const roomPrefixes = [
-      "Pressure", "Abyssal", "Drowned", "Rusted", "Shivering", "Silent", "Leaking", "Blackwater", "Crushing", "Frozen"
-    ];
-    const roomTypes = [
-      "Pump Hall", "Crew Quarters", "Maintenance Spine", "Hydroponics Bay", "Armory Annex", "Turbine Gallery", "Med Ward", "Lab Cluster", "Cargo Trench", "Observation Ring"
-    ];
-    const hazards = [
-      "flickering emergency lights", "waist-high water", "burst pipes screaming steam", "low visibility plankton clouds", "floating debris fields", "electrical arcs in the ceiling"
-    ];
-    const entityNames = [
-      "The Sonar Widow", "Brine Stalker", "Murmur Eel", "Hull Gnawer", "The Drowned Pilot", "Floodborn Choir", "Glassjaw Leviathan", "Anchor Hound", "Silt Warden", "Pressure Shade",
-      "Crabbed Priest", "Echo Maw", "Gasket Mimic", "Widowfish Swarm", "The Blind Navigator"
+    const entitiesCatalog = [
+      {
+        name: 'Brine Stalker',
+        avoid: 'sound',
+        tip: 'It hunts sound. Hold C (crouch) when crossing this room.',
+        failText: 'Your footsteps echo and the Brine Stalker lashes out.'
+      },
+      {
+        name: 'Lumen Leech',
+        avoid: 'light',
+        tip: 'It is phototropic. Turn off your lamp (L) before entering center lane.',
+        failText: 'Your lamp flares; the Lumen Leech swarms your visor.'
+      },
+      {
+        name: 'Sonar Widow',
+        avoid: 'sight',
+        tip: 'Break line-of-sight. Use E near a locker to hide until it passes.',
+        failText: 'It catches your silhouette between strobing lights.'
+      },
+      {
+        name: 'Anchor Hound',
+        avoid: 'flare',
+        tip: 'Throw a flare decoy with F to lure it down side channels.',
+        failText: 'It pounces before you can escape the room.'
+      },
+      {
+        name: 'Pressure Shade',
+        avoid: 'none',
+        tip: 'No direct counter. Cross quickly and keep sanity above critical.',
+        failText: 'The Pressure Shade crushes your nerves and suit seals.'
+      }
     ];
 
-    const game = {
+    const state = {
       room: 1,
-      health: 100,
+      integrity: 100,
       sanity: 100,
       seen: new Set(),
-      scanned: false,
-      currentEntities: [],
-      ended: false
+      flares: 3,
+      lampOn: true,
+      crouching: false,
+      hidden: false,
+      ended: false,
+      currentEncounter: [],
+      roomResolved: false,
+      currentRoomIndex: 0,
+      canHideInRoom: false,
+      overlayOpen: true
     };
 
-    const ui = {
-      roomNum: document.getElementById("roomNum"),
-      health: document.getElementById("health"),
-      sanity: document.getElementById("sanity"),
-      seen: document.getElementById("seen"),
-      roomDescription: document.getElementById("roomDescription"),
-      eventLog: document.getElementById("eventLog"),
-      advanceBtn: document.getElementById("advanceBtn"),
-      scanBtn: document.getElementById("scanBtn"),
-      hideBtn: document.getElementById("hideBtn"),
-      fightBtn: document.getElementById("fightBtn")
-    };
+    const canvas = document.getElementById('game');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x03121f, 0.03);
+
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1200);
+    camera.position.set(0, 1.7, 8);
+
+    const controls = new PointerLockControls(camera, document.body);
+    scene.add(controls.getObject());
+
+    const hemi = new THREE.HemisphereLight(0x58c9ff, 0x001019, 0.35);
+    scene.add(hemi);
+
+    const lamp = new THREE.PointLight(0x8ce5ff, 1.7, 22, 2.2);
+    lamp.position.set(0, 1.6, 0);
+    camera.add(lamp);
+
+    const ambient = new THREE.AmbientLight(0x0b2334, 0.4);
+    scene.add(ambient);
+
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x0a2538, roughness: 0.86, metalness: 0.25 });
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0x17354c, roughness: 0.78, metalness: 0.35 });
+    const accentMat = new THREE.MeshStandardMaterial({ color: 0x1f7ba7, emissive: 0x082838, roughness: 0.62, metalness: 0.48 });
+    const lockerMat = new THREE.MeshStandardMaterial({ color: 0x2e5f7d, roughness: 0.65, metalness: 0.5 });
+
+    const roomData = [];
+    const roomGroup = new THREE.Group();
+    scene.add(roomGroup);
+
+    const roomLabel = document.getElementById('room');
+    const integrityLabel = document.getElementById('integrity');
+    const sanityLabel = document.getElementById('sanity');
+    const seenLabel = document.getElementById('seen');
+    const flaresLabel = document.getElementById('flares');
+    const message = document.getElementById('message');
+    const overlay = document.getElementById('overlay');
+    const startButton = document.getElementById('start');
 
     function rand(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -202,163 +280,319 @@
       return arr[rand(0, arr.length - 1)];
     }
 
-    function makeRoomDescription() {
-      const name = `${pick(roomPrefixes)} ${pick(roomTypes)}`;
-      const hazard = pick(hazards);
-      return `Room ${game.room}/${TOTAL_ROOMS} — ${name}.\nThe compartment groans under pressure with ${hazard}.`;
-    }
+    function generateRoomData() {
+      for (let i = 1; i <= TOTAL_ROOMS; i++) {
+        const encounterCount = i > 85 ? rand(1, 3) : i > 35 ? rand(1, 2) : rand(0, 2);
+        const encounter = [];
+        for (let j = 0; j < encounterCount; j++) encounter.push(pick(entitiesCatalog));
+        if (i % 23 === 0) {
+          encounter.push({
+            name: 'Cathedral Angler',
+            avoid: 'flare',
+            tip: 'Apex class detected. Flare and sprint through immediately.',
+            failText: 'The apex lure opens and swallows the corridor in teeth.'
+          });
+        }
 
-    function spawnEntities() {
-      const maxEntities = game.room > 80 ? 3 : game.room > 35 ? 2 : 1;
-      const count = rand(0, maxEntities);
-      const entities = [];
-      for (let i = 0; i < count; i++) {
-        entities.push(pick(entityNames));
+        roomData.push({
+          index: i,
+          encounter,
+          canHide: Math.random() < 0.55,
+          floodedDepth: rand(20, 70)
+        });
       }
-      if (game.room % 23 === 0) {
-        entities.push("Apex Entity: The Cathedral Angler");
+    }
+
+    function buildComplexGeometry() {
+      const floorGeo = new THREE.PlaneGeometry(12, TOTAL_ROOMS * ROOM_LENGTH + 10);
+      const floor = new THREE.Mesh(floorGeo, floorMat);
+      floor.rotation.x = -Math.PI / 2;
+      floor.position.z = -(TOTAL_ROOMS * ROOM_LENGTH) / 2 + 10;
+      roomGroup.add(floor);
+
+      const ceiling = new THREE.Mesh(floorGeo, wallMat);
+      ceiling.rotation.x = Math.PI / 2;
+      ceiling.position.set(0, 4.5, floor.position.z);
+      roomGroup.add(ceiling);
+
+      const sideWallGeo = new THREE.PlaneGeometry(TOTAL_ROOMS * ROOM_LENGTH + 10, 5.4);
+      const leftWall = new THREE.Mesh(sideWallGeo, wallMat);
+      leftWall.rotation.y = Math.PI / 2;
+      leftWall.position.set(-6, 2.2, floor.position.z);
+      roomGroup.add(leftWall);
+
+      const rightWall = new THREE.Mesh(sideWallGeo, wallMat);
+      rightWall.rotation.y = -Math.PI / 2;
+      rightWall.position.set(6, 2.2, floor.position.z);
+      roomGroup.add(rightWall);
+
+      for (let i = 1; i <= TOTAL_ROOMS; i++) {
+        const roomZ = -((i - 1) * ROOM_LENGTH);
+
+        const dividerGeo = new THREE.BoxGeometry(12, 4.5, 0.35);
+        const divider = new THREE.Mesh(dividerGeo, wallMat);
+        divider.position.set(0, 2.2, roomZ - ROOM_LENGTH / 2);
+        roomGroup.add(divider);
+
+        const doorGeo = new THREE.BoxGeometry(2.8, 3.1, 0.5);
+        const door = new THREE.Mesh(doorGeo, accentMat);
+        door.position.set(0, 1.55, roomZ - ROOM_LENGTH / 2);
+        roomGroup.add(door);
+
+        const stripGeo = new THREE.BoxGeometry(11.2, 0.05, 0.6);
+        const strip = new THREE.Mesh(stripGeo, accentMat);
+        strip.position.set(0, 0.05, roomZ - 9.5);
+        roomGroup.add(strip);
+
+        if (roomData[i - 1].canHide) {
+          const locker = new THREE.Mesh(new THREE.BoxGeometry(1.3, 2.2, 1.2), lockerMat);
+          locker.position.set(Math.random() < 0.5 ? -4.7 : 4.7, 1.1, roomZ - rand(6, 13));
+          roomGroup.add(locker);
+        }
       }
-      return entities;
     }
 
-    function statusText() {
-      ui.roomNum.textContent = `${game.room} / ${TOTAL_ROOMS}`;
-      ui.health.textContent = `${Math.max(game.health, 0)}%`;
-      ui.sanity.textContent = `${Math.max(game.sanity, 0)}%`;
-      ui.seen.textContent = `${game.seen.size}`;
+    const movement = { fwd: false, back: false, left: false, right: false, sprint: false };
+
+    function updateHud() {
+      roomLabel.textContent = `${state.room} / ${TOTAL_ROOMS}`;
+      integrityLabel.textContent = `${Math.max(0, Math.round(state.integrity))}%`;
+      sanityLabel.textContent = `${Math.max(0, Math.round(state.sanity))}%`;
+      seenLabel.textContent = String(state.seen.size);
+      flaresLabel.textContent = String(state.flares);
     }
 
-    function endGame(message) {
-      game.ended = true;
-      ui.eventLog.textContent = message;
-      ui.advanceBtn.disabled = true;
-      ui.scanBtn.disabled = true;
-      ui.hideBtn.disabled = true;
-      ui.fightBtn.disabled = true;
+    function setMessage(text, type = 'normal') {
+      message.innerHTML = text;
+      message.style.borderColor =
+        type === 'danger' ? 'rgba(255,106,120,0.54)' : type === 'ok' ? 'rgba(120,245,178,0.54)' : 'rgba(72,215,230,0.32)';
     }
 
-    function generateRoom() {
-      game.scanned = false;
-      game.currentEntities = spawnEntities();
-      game.currentEntities.forEach(e => game.seen.add(e));
-      ui.roomDescription.textContent = makeRoomDescription();
+    function applyRoomEntryEffects() {
+      const room = roomData[state.currentRoomIndex];
+      state.room = room.index;
+      state.currentEncounter = room.encounter;
+      state.roomResolved = false;
+      state.hidden = false;
+      state.canHideInRoom = room.canHide;
 
-      if (game.currentEntities.length === 0) {
-        ui.eventLog.textContent = "No movement on sonar... for now.";
+      room.encounter.forEach((e) => state.seen.add(e.name));
+
+      if (room.encounter.length === 0) {
+        setMessage(`Room ${state.room}: silent water... for now. Flood depth ${room.floodedDepth}% of hull height.`);
+        state.roomResolved = true;
       } else {
-        ui.eventLog.textContent = `You hear movement in the dark water. ${game.currentEntities.length} hostile signature(s) detected.`;
+        const list = room.encounter.map((e) => `<strong>${e.name}</strong>`).join(', ');
+        const tips = room.encounter.map((e) => `• ${e.tip}`).join('<br>');
+        setMessage(`Room ${state.room} contact: ${list}.<br>${tips}${room.canHide ? '<br>• Locker nearby: press E to hide.' : '<br>• No locker cover in this chamber.'}`,'danger');
       }
 
-      if (game.room === TOTAL_ROOMS) {
-        ui.eventLog.textContent += "\nThe command vault hatch is visible through the flooded corridor.";
-      }
+      state.sanity -= 0.3 + room.encounter.length * 0.45;
+      updateHud();
+      checkLose();
 
-      statusText();
-    }
-
-    function advanceRoom() {
-      if (game.ended) return;
-
-      if (game.currentEntities.length > 0) {
-        game.health -= rand(4, 12);
-        game.sanity -= rand(3, 8);
-        ui.eventLog.textContent = "You tried to move while hunted and were attacked in the current room.";
-      } else {
-        game.health -= rand(0, 2);
-        game.sanity -= 1;
-      }
-
-      if (game.health <= 0 || game.sanity <= 0) {
-        endGame("You collapse in the deep. The complex keeps your name.");
-        statusText();
-        return;
-      }
-
-      if (game.room >= TOTAL_ROOMS) {
-        endGame("You sealed the vault and surfaced the complex. You survived all 115 rooms.");
-        return;
-      }
-
-      game.room += 1;
-      generateRoom();
-    }
-
-    function scanRoom() {
-      if (game.ended) return;
-      game.scanned = true;
-      if (game.currentEntities.length === 0) {
-        ui.eventLog.textContent = "Scan complete: empty room, but distant knocks answer your ping.";
-        return;
-      }
-
-      const entities = [...new Set(game.currentEntities)].join(", ");
-      game.sanity -= rand(1, 4);
-      ui.eventLog.textContent = `Scan complete: ${entities}.\nKnowing what is here costs you sleep and nerve.`;
-      statusText();
-
-      if (game.sanity <= 0) {
-        endGame("Your mind fractures in the static and dark water.");
+      if (state.room === TOTAL_ROOMS && state.roomResolved && !state.ended) {
+        winGame();
       }
     }
 
-    function hide() {
-      if (game.ended) return;
-      if (game.currentEntities.length === 0) {
-        ui.eventLog.textContent = "You hide inside a locker anyway. Nothing finds you.";
-        game.sanity -= 1;
-      } else {
-        const success = Math.random() < 0.65;
-        if (success) {
-          ui.eventLog.textContent = "You stay still as shadows pass. The entities drift away.";
-          game.currentEntities = [];
-          game.sanity -= rand(1, 3);
-        } else {
-          ui.eventLog.textContent = "Your breath fogs your visor. Something sees you.";
-          game.health -= rand(8, 15);
-          game.sanity -= rand(5, 10);
+    function resolveEncounterIfPossible() {
+      if (state.roomResolved || state.currentEncounter.length === 0) return;
+
+      let failHits = 0;
+      for (const entity of state.currentEncounter) {
+        const avoided =
+          entity.avoid === 'sound' ? state.crouching :
+          entity.avoid === 'light' ? !state.lampOn :
+          entity.avoid === 'sight' ? state.hidden :
+          entity.avoid === 'flare' ? state.flaresUsedThisRoom :
+          false;
+
+        if (!avoided) {
+          failHits += 1;
+          state.integrity -= rand(6, 14);
+          state.sanity -= rand(4, 10);
+          setMessage(`${entity.failText}<br><span class="danger">You failed to counter ${entity.name}.</span>`, 'danger');
         }
       }
 
-      statusText();
-      if (game.health <= 0 || game.sanity <= 0) {
-        endGame("The hiding place becomes your tomb.");
+      if (failHits === 0) {
+        setMessage(`You executed the right counters and slipped through room ${state.room}.`, 'ok');
+      }
+
+      state.roomResolved = true;
+      updateHud();
+      checkLose();
+
+      if (state.room === TOTAL_ROOMS && !state.ended) {
+        winGame();
       }
     }
 
-    function fight() {
-      if (game.ended) return;
-      if (game.currentEntities.length === 0) {
-        ui.eventLog.textContent = "You swing at the water. Only your reflection breaks.";
-        game.sanity -= 2;
-        statusText();
-        return;
+    function winGame() {
+      state.ended = true;
+      setMessage('<span class="ok">You reached room 115, sealed the command vault, and surfaced the complex alive.</span>', 'ok');
+      overlay.style.display = 'grid';
+      document.getElementById('overlayCard').innerHTML = `
+        <h1>Mission Complete</h1>
+        <p class="ok">You survived all 115 rooms.</p>
+        <p>Entities cataloged: ${state.seen.size}</p>
+        <button onclick="location.reload()">Dive Again</button>
+      `;
+      controls.unlock();
+    }
+
+    function checkLose() {
+      if (state.integrity > 0 && state.sanity > 0) return;
+      state.ended = true;
+      setMessage('<span class="danger">You are consumed by the flooded complex. Dive failed.</span>', 'danger');
+      overlay.style.display = 'grid';
+      document.getElementById('overlayCard').innerHTML = `
+        <h1>Dive Lost</h1>
+        <p class="danger">Integrity or sanity reached zero.</p>
+        <p>Last room: ${state.room}/${TOTAL_ROOMS}</p>
+        <button onclick="location.reload()">Retry</button>
+      `;
+      controls.unlock();
+    }
+
+    function onKeyDown(e) {
+      if (state.ended) return;
+      if (e.code === 'KeyW') movement.fwd = true;
+      if (e.code === 'KeyS') movement.back = true;
+      if (e.code === 'KeyA') movement.left = true;
+      if (e.code === 'KeyD') movement.right = true;
+      if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') movement.sprint = true;
+
+      if (e.code === 'KeyC') {
+        state.crouching = true;
+        camera.position.y = 1.1;
       }
 
-      const power = rand(25, 100);
-      const threshold = 35 + game.currentEntities.length * 18;
-
-      if (power >= threshold) {
-        ui.eventLog.textContent = `You force the entities back with flares and shock rounds. Room secured.`;
-        game.currentEntities = [];
-        game.health -= rand(3, 7);
-      } else {
-        ui.eventLog.textContent = `The fight turns brutal. You survive, but not untouched.`;
-        game.health -= rand(12, 24);
-        game.sanity -= rand(8, 16);
+      if (e.code === 'KeyL') {
+        state.lampOn = !state.lampOn;
+        lamp.intensity = state.lampOn ? 1.7 : 0.15;
+        setMessage(state.lampOn ? 'Lamp ON: visibility up, but light-sensitive entities may detect you.' : 'Lamp OFF: darker path, reduced light signature.');
       }
 
-      statusText();
-      if (game.health <= 0 || game.sanity <= 0) {
-        endGame("Your final stand sinks beneath the alarms.");
+      if (e.code === 'KeyF') {
+        if (state.flares > 0) {
+          state.flares -= 1;
+          state.flaresUsedThisRoom = true;
+          state.sanity -= 0.8;
+          setMessage('Flare deployed. Heat/sound decoy active in this room.', 'ok');
+        } else {
+          setMessage('No flares remaining.', 'danger');
+        }
+        updateHud();
+      }
+
+      if (e.code === 'KeyE') {
+        if (!state.canHideInRoom) {
+          setMessage('No suitable hiding locker in this room.', 'danger');
+          return;
+        }
+        state.hidden = !state.hidden;
+        setMessage(state.hidden ? 'You hide in a locker and break line-of-sight.' : 'You step out of the locker.');
       }
     }
 
-    ui.advanceBtn.addEventListener("click", advanceRoom);
-    ui.scanBtn.addEventListener("click", scanRoom);
-    ui.hideBtn.addEventListener("click", hide);
-    ui.fightBtn.addEventListener("click", fight);
+    function onKeyUp(e) {
+      if (e.code === 'KeyW') movement.fwd = false;
+      if (e.code === 'KeyS') movement.back = false;
+      if (e.code === 'KeyA') movement.left = false;
+      if (e.code === 'KeyD') movement.right = false;
+      if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') movement.sprint = false;
+      if (e.code === 'KeyC') {
+        state.crouching = false;
+        camera.position.y = 1.7;
+      }
+    }
 
-    generateRoom();
+    const velocity = new THREE.Vector3();
+    const direction = new THREE.Vector3();
+    let prev = performance.now();
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const now = performance.now();
+      const dt = (now - prev) / 1000;
+      prev = now;
+
+      if (!state.ended && controls.isLocked) {
+        direction.z = Number(movement.fwd) - Number(movement.back);
+        direction.x = Number(movement.right) - Number(movement.left);
+        direction.normalize();
+
+        const baseSpeed = state.crouching ? 2.4 : movement.sprint ? 7.8 : 4.6;
+
+        velocity.x = direction.x * baseSpeed * dt;
+        velocity.z = direction.z * baseSpeed * dt;
+
+        controls.moveRight(velocity.x);
+        controls.moveForward(velocity.z);
+
+        const p = controls.getObject().position;
+        p.x = THREE.MathUtils.clamp(p.x, -4.8, 4.8);
+        p.z = Math.min(8, Math.max(-(TOTAL_ROOMS * ROOM_LENGTH) + 1, p.z));
+
+        const index = Math.min(TOTAL_ROOMS - 1, Math.max(0, Math.floor(Math.abs(p.z) / ROOM_LENGTH)));
+        if (index !== state.currentRoomIndex) {
+          state.currentRoomIndex = index;
+          state.flaresUsedThisRoom = false;
+          applyRoomEntryEffects();
+        }
+
+        const roomProgress = Math.abs(p.z) % ROOM_LENGTH;
+        if (!state.roomResolved && roomProgress > ROOM_LENGTH * 0.82) {
+          resolveEncounterIfPossible();
+        }
+
+        state.sanity -= dt * 0.02;
+        updateHud();
+        checkLose();
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    startButton.addEventListener('click', () => {
+      overlay.style.display = 'none';
+      state.overlayOpen = false;
+      controls.lock();
+      setMessage('Dive started. Enter rooms physically and adapt to each entity type.');
+    });
+
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keyup', onKeyUp);
+
+    controls.addEventListener('unlock', () => {
+      if (!state.ended && !state.overlayOpen) {
+        overlay.style.display = 'grid';
+        document.getElementById('overlayCard').innerHTML = `
+          <h1>Paused</h1>
+          <p>Click resume, then click inside the game to lock pointer and continue.</p>
+          <button id="resume">Resume</button>
+        `;
+        document.getElementById('resume').onclick = () => {
+          overlay.style.display = 'none';
+          controls.lock();
+        };
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    generateRoomData();
+    buildComplexGeometry();
+    applyRoomEntryEffects();
+    updateHud();
+    animate();
   </script>
 </body>
 </html>
